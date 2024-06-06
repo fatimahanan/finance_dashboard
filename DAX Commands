@@ -1,0 +1,30 @@
+Total Sales Actual = SUM(Actual[Sales])
+
+Total Sales Target = SUM(Targets[Sales])
+
+Variance = [Total Sales Actual]-[Total Sales Target]
+
+Variance % = DIVIDE([Variance],[Total Sales Target])
+
+Variance PCT Label = 
+VAR up = "🟢" 
+VAR down="🔴" 
+VAR formatted_var_pct = FORMAT(ABS([Variance %]), "0.0%")
+RETURN formatted_var_pct & " " & IF([Variance %]>0, up, down)
+
+Target Status = IF([Variance]>0,1,-1)
+
+YTD Sales Actual = CALCULATE([Total Sales Actual], DATESYTD('Calendar'[Date]))
+
+YTD Sales Target = CALCULATE([Total Sales Target], DATESYTD('Calendar'[Date]))
+
+YTD Variance = [YTD Sales Actual]-[YTD Sales Target]
+
+YTD Variance % = DIVIDE([YTD Variance],[YTD Sales Target])
+
+Months Target Reached = 
+VAR months_with_target_reached = FILTER(ALL('Calendar'),[Variance]>0) 
+RETURN COUNTROWS(months_with_target_reached)
+Trend Chart Title = 
+VAR month_count= COUNTROWS('Calendar') 
+RETURN "We met targets for " & [Months Target Reached] & " out of " & month_count & " months"
